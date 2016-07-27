@@ -1,14 +1,14 @@
-﻿using Assets.Scripts.EntitiesActions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.Entities
 {
     public class Mob : AliveEntity
     {
+        void Awake()
+        {
+            animator = GetComponent<Animator>();
+        }
+
         public override void Attack()
         {
             PlayAttackAnimation();
@@ -31,6 +31,18 @@ namespace Assets.Scripts.Entities
             transform.position = Vector3.MoveTowards
                 (transform.position, new Vector3(x, 0.0f, z),
                     movementSpeed * Time.deltaTime);
+            PlayMoveAnimation(x, z);
+        }
+
+        private void PlayMoveAnimation(float x, float z)
+        {
+            bool moving = x != 0f || z != 0f;
+            animator.SetBool("Moving", moving);
+        }
+
+        public override void CastSpell()
+        {
+            
         }
     }
 }

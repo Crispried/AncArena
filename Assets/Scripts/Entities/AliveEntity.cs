@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Assets.Scripts.EntitiesActions;
-using System;
-using Assets.Scripts.DataStructures;
+using Assets.Scripts.DataStructures.Concrete;
 
 namespace Assets.Scripts
 {
@@ -119,12 +117,7 @@ namespace Assets.Scripts
             return false;
         }
 
-        public void CastSpell()
-        {
-            MP -= currentSkill.ManaCost;
-            currentSkill.NextCastDelay = Time.time + currentSkill.Cooldown;
-            Instantiate(currentSkill.AttackPrefab);
-        }
+        public abstract void CastSpell();
 
         public bool PossibleToCastSpell()
         {

@@ -1,9 +1,9 @@
-﻿using Assets.Scripts.EntitiesActions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections;
 using UnityEngine;
+using Assets.Scripts.DataStructures.Concrete;
+using Assets.Scripts.GameSystems.Concrete;
+using Assets.Scripts.GameSystems;
+using Assets.Scripts.GameSystems.Abstract;
 
 namespace Assets.Scripts.Entities
 {
@@ -16,12 +16,19 @@ namespace Assets.Scripts.Entities
 
         private Vector3 movement;
 
+        private IBlendTreeToggleSystem comboSystem;
+
+        public float changeStateStep = 0.5f;
+
+        public ComboAttack[] comboAttacks;
+
         void Awake()
         {
             animator = GetComponent<Animator>();
             currentSkill = skills[skillIndex];
             characterRigidbody = GetComponent<Rigidbody>();
             timeLeftToMakeNextAttack = comboNextAttackHotTime;
+            comboSystem = new ComboSystem(changeStateStep, comboAttacks);
         }
 
         public override void Move(float x, float z)
@@ -41,18 +48,49 @@ namespace Assets.Scripts.Entities
 
         public override void Attack()
         {
+            possibleToMove = false;
+            nextFireDelay = Time.time + attackSpeed;
             PlayAttackAnimation();
         }
 
         private void PlayAttackAnimation()
         {
-            Debug.Log("Currect combo attack animation played here");
+            animator.SetTrigger("Attacking");
+            animator.SetFloat("ComboState", comboSystem.CurrentActionState);
+            StartCoroutine(ActivatePossibilityToMoveAfter(comboSystem.CurrentActionExecutionTime));
+            comboSystem.NextActionState();
+        }
+
+        IEnumerator ActivatePossibilityToMoveAfter(float waitTime)
+        {
+            yield return new WaitForSeconds(waitTime);
+            possibleToMove = true;
         }
 
         public override void Die()
         {
             animator.SetTrigger("Die");
             Destroy(this.gameObject, destroyTime);
+        }
+
+        public override void CastSpell()
+        {
+            MP -= currentSkill.ManaCost;
+            currentSkill.NextCastDelay = Time.time + currentSkill.Cooldown;
+            PlaySpellAnimation();
+            StartCoroutine(CastAfter(currentSkill.StartDelay));
+        }
+
+        private IEnumerator CastAfter(float startDelay)
+        {
+            yield return new WaitForSeconds(startDelay);
+            Instantiate(currentSkill.AttackPrefab);
+        }
+
+        private void PlaySpellAnimation()
+        {
+            animator.SetTrigger("Casting");
+            animator.SetFloat("SkillState", currentSkill.AnimationState);
         }
 
         public void NextSkill()

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Assets.Scripts.DataStructures;
 
 namespace Assets.Scripts
 {
@@ -27,7 +28,8 @@ namespace Assets.Scripts
             character = GameObject.FindGameObjectWithTag("Character");
             mobs = new GameObject[1];
             DetermineRelativeSpawnPosition();
-            GenerateRandomSkybox();
+            //GenerateRandomSkybox();
+            SpawnMobs();
         }
 
         void Update()

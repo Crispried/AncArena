@@ -2,11 +2,15 @@
 using UnityEngine;
 using System;
 
-namespace Assets.Scripts.DataStructures
+namespace Assets.Scripts.DataStructures.Concrete
 {
     [Serializable]
     public class Skill
     {
+        [SerializeField]
+        [Tooltip("Value which determines skill animation in blend tree")]
+        private float animationState;
+
         [SerializeField]
         private float damage;
 
@@ -20,6 +24,9 @@ namespace Assets.Scripts.DataStructures
         private float manaCost;
 
         private float nextCastDelay = 0.0f;
+
+        [SerializeField]
+        private float startDelay = 0;
 
         public float NextCastDelay
         {
@@ -78,6 +85,30 @@ namespace Assets.Scripts.DataStructures
             set
             {
                 attackPrefab = value;
+            }
+        }
+
+        public float AnimationState
+        {
+            get
+            {
+                return animationState;
+            }
+            set
+            {
+                animationState = value;
+            }
+        }
+
+        public float StartDelay
+        {
+            get
+            {
+                return startDelay;
+            }
+            set
+            {
+                startDelay = value;
             }
         }
     }

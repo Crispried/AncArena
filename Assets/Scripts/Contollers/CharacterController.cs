@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using Assets.Scripts.Entities;
 using Assets.Scripts.DataStructures;
-using Assets.Scripts.GameSystems;
-using System;
+using Assets.Scripts.GameSystems.Abstract;
+using Assets.Scripts.GameSystems.Concrete;
 
 namespace Assets.Scripts.Contollers
 {
@@ -11,12 +10,15 @@ namespace Assets.Scripts.Contollers
     {
         private Character character;
 
-        private Direction inputDirection;
+        private Vector3 inputDirection;
+
+        private IMovementInputSystem movementInputSystem;
 
         void Awake()
         {
             character = GetComponent<Character>();
-            inputDirection = new Direction();
+            inputDirection = new Vector3();
+            movementInputSystem = GetComponent<IMovementInputSystem>();
         }
 
         void FixedUpdate()
@@ -26,12 +28,10 @@ namespace Assets.Scripts.Contollers
 
         void Update()
         {            
-            Attack();
-            CastSpell();
             Die();
         }
 
-        private void CastSpell()
+        private void TryCastSpell()
         {
             if (character.PossibleToCastSpell())
             {
@@ -51,13 +51,13 @@ namespace Assets.Scripts.Contollers
         {
             if (character.PossibleToMove())
             {
-                inputDirection = MovementInputSystem.GetInputDirection();
-                character.Move(inputDirection.X, inputDirection.Z);
+                inputDirection = movementInputSystem.GetInputDirection();
+                character.Move(inputDirection.x, inputDirection.z);
             }
         }
 
-        private void Attack()
-        {
+        private void TryAttack()
+        {           
             if (character.PossibleToAttack())
             {
                 character.Attack();

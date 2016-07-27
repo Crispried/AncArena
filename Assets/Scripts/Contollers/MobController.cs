@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using Assets.Scripts.Entities;
 
 namespace Assets.Scripts.Contollers
@@ -41,9 +40,9 @@ namespace Assets.Scripts.Contollers
         {
             for (int i = 0; i < mobs.Length; i++)
             {
-                if (mob.MustDie())
+                if (mobs[i].MustDie())
                 {
-                    mob.Die();
+                    mobs[i].Die();
                 }
             }
         }
@@ -54,10 +53,13 @@ namespace Assets.Scripts.Contollers
 
         private void Move()
         {
-            if (mob.PossibleToMove())
+            for (int i = 0; i < mobs.Length; i++)
             {
-                mob.Move(character.transform.position.x,
-                         character.transform.position.z);
+                if (mobs[i].PossibleToMove())
+                {
+                    mobs[i].Move(character.transform.position.x,
+                             character.transform.position.z);
+                }
             }
         }
 
