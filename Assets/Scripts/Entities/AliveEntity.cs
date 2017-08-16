@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Assets.Scripts.EntitiesActions;
 using Assets.Scripts.DataStructures.Concrete;
+using Assets.Scripts.Events;
 
 namespace Assets.Scripts
 {
@@ -31,7 +32,10 @@ namespace Assets.Scripts
         protected float attackSpeed = 1;
 
         [SerializeField]
-        protected float attackRadius = 1;
+        protected float attackAreaWidth = 1;
+
+        [SerializeField]
+        protected float attackAreaHeight = 1;
 
         protected Animator animator;
 
@@ -62,6 +66,14 @@ namespace Assets.Scripts
 
         protected bool possibleToMove = true;
 
+        public Vector3 EntityPosition
+        {
+            get
+            {
+                return transform.position;
+            }
+        }
+
         public string GetCurrentSkillName
         {
             get
@@ -70,63 +82,87 @@ namespace Assets.Scripts
             }
         }
 
-        public void TakeDamage(float dealedDamage)
+        public float GetMP
+        {
+            get
+            {
+                return MP;
+            }
+        }
+
+        public float GetHp
+        {
+            get
+            {
+                return HP;
+            }
+        }
+
+        public float Damage
+        {
+            get
+            {
+                return damage;
+            }
+        }
+
+        public float AttackAreaWidth
+        {
+            get
+            {
+                return attackAreaWidth;
+            }
+        }
+
+        public float AttackAreaHeight
+        {
+            get
+            {
+                return attackAreaHeight;
+            }
+        }
+
+        public virtual void TakeDamage(float dealedDamage)
         {
             HP -= dealedDamage;
+            if (MustDie())
+            {
+                Die();
+            }
         }
 
         public bool PossibleToTakeDamage()
         {
-            if (HP > 0)
-            {
-                return true;
-            }
-            return false;
+            return HP > 0;
         }
 
         public abstract void Die();
 
         public bool MustDie()
         {
-            if (HP <= 0)
-            {
-                return true;
-            }
-            return false;
+            return HP <= 0;
         }
 
         public abstract void Attack();
 
-        public bool PossibleToAttack()
+        public virtual bool PossibleToAttack()
         {
-            if ((Time.time > nextFireDelay))
-            {
-                return true;
-            }
-            return false;
+            return Time.time > nextFireDelay;
         }
 
         public abstract void Move(float x, float z);
 
         public bool PossibleToMove()
         {
-            if (possibleToMove)
-            {
-                return true;
-            }
-            return false;
+            return possibleToMove;
         }
 
         public abstract void CastSpell();
 
         public bool PossibleToCastSpell()
         {
-            if ((Time.time > currentSkill.NextCastDelay) &&
-                (MP >= currentSkill.ManaCost))
-            {
-                return true;
-            }
-            return false;
+            return (Time.time > currentSkill.NextCastDelay) &&
+                   (MP >= currentSkill.ManaCost);
         }
     }
 }

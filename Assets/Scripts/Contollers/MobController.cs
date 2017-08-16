@@ -13,6 +13,8 @@ namespace Assets.Scripts.Contollers
 
         private GameObject character;
 
+        private Character characterEntity;
+
         void Awake()
         {
             mobsGameobjects = GameObject.FindGameObjectsWithTag("Mob");
@@ -22,49 +24,56 @@ namespace Assets.Scripts.Contollers
                 mobs[i] = mobsGameobjects[i].GetComponent<Mob>();
             }
             character = GameObject.FindGameObjectWithTag("Character");
-        }
-
-        void FixedUpdate()
-        {
-            Move();
+            characterEntity = character.GetComponent<Character>();
         }
 
         void Update()
         {
-            Attack();
-            CastSpell();
-            Die();
+            ExecuteBehaviour();
         }
 
-        private void Die()
+        private void ExecuteBehaviour()
         {
             for (int i = 0; i < mobs.Length; i++)
             {
-                if (mobs[i].MustDie())
+                if (mobs[i].IsInAttackRadiusWith(character))
                 {
-                    mobs[i].Die();
+                    Attack(mobs[i]);
+                }
+                else
+                {
+                    Move(mobs[i]);
                 }
             }
         }
 
-        private void CastSpell()
+        private void Move(Mob mob)
         {
+            if (mob.PossibleToMove())
+            {
+                mob.Move(character.transform.position.x,
+                         character.transform.position.z);
+            }
         }
 
-        private void Move()
+        private void Attack(Mob mob)
         {
             for (int i = 0; i < mobs.Length; i++)
             {
-                if (mobs[i].PossibleToMove())
+                if (mob.PossibleToAttack())
                 {
-                    mobs[i].Move(character.transform.position.x,
-                             character.transform.position.z);
+                    mob.Attack();
+                    ProcessDamage(mob);
                 }
             }
         }
 
-        private void Attack()
+        private void ProcessDamage(Mob mob)
         {
+            if (characterEntity.PossibleToTakeDamage())
+            {
+                characterEntity.TakeDamage(mob.Damage);
+            }
         }
     }
 }

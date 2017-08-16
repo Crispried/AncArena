@@ -10,9 +10,11 @@ namespace Assets.Scripts.DataStructures.Concrete
     [Serializable]
     public class ComboAttack : IBlendTreeAction
     {
+        [Tooltip("State of attack in blend tree")]
         [SerializeField]
         private float attackState = 0;
 
+        [Tooltip("Time which need to execute this attack")]
         [SerializeField]
         private float executeAttackTime = 1;
 

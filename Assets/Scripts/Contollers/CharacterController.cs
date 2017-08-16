@@ -3,6 +3,8 @@ using Assets.Scripts.Entities;
 using Assets.Scripts.DataStructures;
 using Assets.Scripts.GameSystems.Abstract;
 using Assets.Scripts.GameSystems.Concrete;
+using Assets.Scripts.Events;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.Contollers
 {
@@ -14,6 +16,8 @@ namespace Assets.Scripts.Contollers
 
         private IMovementInputSystem movementInputSystem;
 
+        private CharacterEvents healthChanged;
+
         void Awake()
         {
             character = GetComponent<Character>();
@@ -23,12 +27,12 @@ namespace Assets.Scripts.Contollers
 
         void FixedUpdate()
         {
-            Move();
+            TryMove();
         }
 
         void Update()
-        {            
-            Die();
+        {
+           // GetAllMobsInAttackArea();
         }
 
         private void TryCastSpell()
@@ -39,15 +43,7 @@ namespace Assets.Scripts.Contollers
             }
         }
 
-        private void Die()
-        {
-            if (character.MustDie())
-            {
-                character.Die();
-            }
-        }
-
-        private void Move()
+        private void TryMove()
         {
             if (character.PossibleToMove())
             {
@@ -61,7 +57,30 @@ namespace Assets.Scripts.Contollers
             if (character.PossibleToAttack())
             {
                 character.Attack();
+                GetAllMobsInAttackArea();
             }
+        }
+
+        public List<Mob> GetAllMobsInAttackArea()
+        {           
+            List<Mob> result = new List<Mob>();
+            RaycastHit[] sphereHits =
+                Physics.SphereCastAll(new Ray(transform.position,
+                transform.forward), character.DamageRadius.AttackRadius,
+                character.DamageRadius.AttackLegnth);
+            Mob tempMob;
+            foreach (var sphereHit in sphereHits)
+            {
+                if (sphereHit.transform.tag == "Mob")
+                {
+                    tempMob = sphereHit.transform.gameObject.GetComponent<Mob>();
+                    if (tempMob.PossibleToTakeDamage())
+                    {
+                        tempMob.TakeDamage(character.Damage);
+                    }
+                }
+            }
+            return result;
         }
     }
 }

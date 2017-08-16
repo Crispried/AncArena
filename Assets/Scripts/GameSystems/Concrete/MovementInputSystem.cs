@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using Assets.Scripts.GameSystems.Abstract;
+using Assets.Scripts.Contollers.UI;
 
 namespace Assets.Scripts.GameSystems.Concrete
 {
     public class MovementInputSystem : MonoBehaviour, IMovementInputSystem
     {
-        private VirtualJoystick joystick;
+        private VirtualJoystickController joystick;
 
         private Vector3 inputDirection;
 
         void Awake()
         {
             joystick = GameObject.FindGameObjectWithTag("VirtualJoystick").
-                                    GetComponent<VirtualJoystick>();
+                                    GetComponent<VirtualJoystickController>();
 
         }
 

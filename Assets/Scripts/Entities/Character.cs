@@ -4,6 +4,8 @@ using Assets.Scripts.DataStructures.Concrete;
 using Assets.Scripts.GameSystems.Concrete;
 using Assets.Scripts.GameSystems;
 using Assets.Scripts.GameSystems.Abstract;
+using System;
+using Assets.Scripts.Events;
 
 namespace Assets.Scripts.Entities
 {
@@ -18,7 +20,19 @@ namespace Assets.Scripts.Entities
 
         private IBlendTreeToggleSystem comboSystem;
 
-        public float changeStateStep = 0.5f;
+        [SerializeField]
+        private DamageRadius damageRadius;
+
+        [SerializeField]
+        private float changeStateStep;
+
+        public DamageRadius DamageRadius
+        {
+            get
+            {
+                return damageRadius;
+            }
+        }
 
         public ComboAttack[] comboAttacks;
 
@@ -78,6 +92,14 @@ namespace Assets.Scripts.Entities
             MP -= currentSkill.ManaCost;
             currentSkill.NextCastDelay = Time.time + currentSkill.Cooldown;
             PlaySpellAnimation();
+            CharacterEvents.MpChanged();
+        }
+
+        private void PlaySpellAnimation()
+        {
+            possibleToMove = false;
+            animator.SetTrigger("Casting");
+            animator.SetFloat("SkillState", currentSkill.AnimationState);
             StartCoroutine(CastAfter(currentSkill.StartDelay));
         }
 
@@ -85,12 +107,7 @@ namespace Assets.Scripts.Entities
         {
             yield return new WaitForSeconds(startDelay);
             Instantiate(currentSkill.AttackPrefab);
-        }
-
-        private void PlaySpellAnimation()
-        {
-            animator.SetTrigger("Casting");
-            animator.SetFloat("SkillState", currentSkill.AnimationState);
+            possibleToMove = true;
         }
 
         public void NextSkill()
@@ -111,6 +128,12 @@ namespace Assets.Scripts.Entities
                 skillIndex = skills.Length - 1;
             }
             currentSkill = skills[skillIndex];
+        }
+
+        public override void TakeDamage(float dealedDamage)
+        {
+            CharacterEvents.HpChanged();
+            base.TakeDamage(dealedDamage);
         }
     }
 }
